@@ -2,21 +2,20 @@
 
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>請假申請系統</title>
   <style>
     body {
-      background: linear-gradient(to bottom right, #f2f2f2, #ffffff);
+      background: linear-gradient(to bottom right, #ebebeb, #ffffff);
       font-family: "Noto Sans TC", sans-serif;
       color: #333;
       margin: 0;
       padding: 0;
       text-align: center;
     }
-    /* 灰色為主的標題 */
     header {
-      background-color: #e6e6e6;
+      background-color: #cccccc;
       padding: 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
@@ -37,39 +36,22 @@
       margin: 10px;
       padding: 10px 14px;
       border-radius: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid #bbb;
       font-size: 15px;
       width: 70%;
       max-width: 300px;
     }
-    textarea {
-      height: 80px;
-      resize: none;
-    }
+    textarea { height: 80px; resize: none; }
     button {
       border: none;
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    /* 粉色主按鈕 */
-    .btn-main {
-      background-color: #ffc4d0;
-      color: #5c1e33;
-    }
-    .btn-main:hover {
-      background-color: #ffadc0;
-    }
-    /* 藍灰管理員按鈕 */
-    .btn-admin {
-      background-color: #d7e9ff;
-      color: #233a5c;
-    }
-    .btn-admin:hover {
-      background-color: #c2dcff;
-    }
-    section {
-      margin-bottom: 30px;
-    }
+    .btn-main { background-color: #ffc4d0; color: #5c1e33; }
+    .btn-main:hover { background-color: #ffadc0; }
+    .btn-admin { background-color: #d0def0; color: #233a5c; }
+    .btn-admin:hover { background-color: #bfcde3; }
+    section { margin-bottom: 30px; }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -78,14 +60,8 @@
       border-radius: 10px;
       overflow: hidden;
     }
-    th, td {
-      border-bottom: 1px solid #ddd;
-      padding: 10px;
-    }
-    th {
-      background-color: #efefef;
-    }
-    /* 假別顏色 */
+    th, td { border-bottom: 1px solid #ddd; padding: 10px; }
+    th { background-color: #e0e0e0; }
     .type-事假 { background-color: #fff7c4; }
     .type-病假 { background-color: #ffcfcf; }
     .type-公假 { background-color: #c9f5d6; }
@@ -102,45 +78,46 @@
   </header>
 
   <main>
-    <!-- 登入畫面 -->
     <section id="loginSection">
       <h2>登入系統</h2>
       <div style="border:1px solid #ccc; border-radius:15px; padding:20px; margin-bottom:30px;">
         <h3>一般使用者登入</h3>
         <form id="userLoginForm">
-          <label>姓名：</label><br>
-          <input type="text" id="userName" placeholder="請輸入姓名" required><br>
+          <label>姓名：</label><br />
+          <input type="text" id="userName" placeholder="請輸入姓名" required /><br />
           <button type="submit" class="btn-main">登入</button>
         </form>
+        <p style="font-size:12px;color:#666;margin-top:6px;">
+          （從 LINE 開啟會自動帶入姓名）
+        </p>
       </div>
 
 ```
   <div style="border:1px solid #ccd6e0; border-radius:15px; padding:20px;">
     <h3>管理者登入</h3>
     <form id="adminLoginForm">
-      <label>帳號：</label><br>
-      <input type="text" id="adminAccount" placeholder="輸入帳號" required><br>
-      <label>密碼：</label><br>
-      <input type="password" id="adminPassword" placeholder="輸入密碼" required><br>
+      <label>帳號：</label><br />
+      <input type="text" id="adminAccount" placeholder="輸入帳號" required /><br />
+      <label>密碼：</label><br />
+      <input type="password" id="adminPassword" placeholder="輸入密碼" required /><br />
       <button type="submit" class="btn-admin">登入</button>
     </form>
   </div>
 </section>
 
-<!-- 使用者介面 -->
 <section id="leaveSection" style="display:none">
   <h2>請假申請</h2>
   <form id="leaveForm">
-    <label>姓名：</label><br>
-    <input type="text" id="name" readonly><br>
+    <label>姓名：</label><br />
+    <input type="text" id="name" readonly /><br />
 
-    <label>開始日期：</label><br>
-    <input type="date" id="startDate" required><br>
+    <label>開始日期：</label><br />
+    <input type="date" id="startDate" required /><br />
 
-    <label>結束日期：</label><br>
-    <input type="date" id="endDate" required><br>
+    <label>結束日期：</label><br />
+    <input type="date" id="endDate" required /><br />
 
-    <label>假別：</label><br>
+    <label>假別：</label><br />
     <select id="reason" required>
       <option value="事假">事假</option>
       <option value="病假">病假</option>
@@ -150,10 +127,10 @@
       <option value="年假">年假</option>
       <option value="補休">補休</option>
       <option value="特休">特休</option>
-    </select><br>
+    </select><br />
 
-    <label>原因（必填）：</label><br>
-    <textarea id="details" placeholder="請說明請假原因" required></textarea><br>
+    <label>原因（必填）：</label><br />
+    <textarea id="details" placeholder="請說明請假原因" required></textarea><br />
 
     <button type="submit" class="btn-main">送出申請</button>
   </form>
@@ -175,11 +152,10 @@
   <button id="logoutBtn" class="btn-admin">登出</button>
 </section>
 
-<!-- 管理員介面 -->
 <section id="adminSection" style="display:none">
   <h2>管理者介面</h2>
   <label>篩選日期：</label>
-  <input type="date" id="filterDate">
+  <input type="date" id="filterDate" />
   <button id="filterBtn" class="btn-main">篩選</button>
   <table id="adminTable">
     <thead>
@@ -211,12 +187,12 @@
     const adminSection = document.getElementById('adminSection');
     const logoutBtn = document.getElementById('logoutBtn');
     const adminLogoutBtn = document.getElementById('adminLogoutBtn');
-
     let currentUser = null;
 
     userLoginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = document.getElementById('userName').value;
+      const name = document.getElementById('userName').value.trim();
+      if (!name) return;
       currentUser = name;
       loginSection.style.display = 'none';
       leaveSection.style.display = 'block';
@@ -264,7 +240,7 @@
         body: JSON.stringify(data)
       });
       const result = await res.json();
-      alert(result.message);
+      alert(result.message || '已送出');
       fetchUserRecords(data.name);
     });
 
@@ -273,7 +249,7 @@
       const data = await res.json();
       const tableBody = document.querySelector('#recordTable tbody');
       tableBody.innerHTML = '';
-      data.leaves.filter(l => l.name === name).forEach(record => {
+      (data.leaves || []).filter(l => l.name === name).forEach(record => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${record.name}</td>
@@ -281,8 +257,7 @@
           <td>${record.end_date}</td>
           <td class="type-${record.reason}">${record.reason}</td>
           <td>${record.details || ''}</td>
-          <td>${record.submit_time}</td>
-        `;
+          <td>${record.submit_time}</td>`;
         tableBody.appendChild(tr);
       });
     }
@@ -292,7 +267,7 @@
       const data = await res.json();
       const tableBody = document.querySelector('#adminTable tbody');
       tableBody.innerHTML = '';
-      data.leaves.forEach(record => {
+      (data.leaves || []).forEach(record => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${record.name}</td>
@@ -300,11 +275,41 @@
           <td>${record.end_date}</td>
           <td class="type-${record.reason}">${record.reason}</td>
           <td>${record.details || ''}</td>
-          <td>${record.submit_time}</td>
-        `;
+          <td>${record.submit_time}</td>`;
         tableBody.appendChild(tr);
       });
     }
+  </script>
+
+  <!-- LIFF SDK（已整合你的 ID） -->
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <script>
+    (async function initLiffSafe() {
+      const LIFF_ID = "2008420032-nzxO4ew0";
+      try {
+        await liff.init({ liffId: LIFF_ID });
+        if (!liff.isLoggedIn()) {
+          liff.login({ redirectUri: window.location.href });
+          return;
+        }
+        const profile = await liff.getProfile();
+        const displayName = profile.displayName || "";
+        const userNameInput = document.getElementById('userName');
+        const readonlyName  = document.getElementById('name');
+        if (userNameInput) userNameInput.value = displayName;
+        if (readonlyName)  readonlyName.value  = displayName;
+        if (displayName) {
+          currentUser = displayName;
+          loginSection.style.display = 'none';
+          leaveSection.style.display = 'block';
+          fetchUserRecords(displayName);
+        }
+      } catch (err) {
+        console.warn("LIFF 初始化失敗或非 LINE 內部開啟：", err);
+      }
+    })();
   </script>
 
 </body>
