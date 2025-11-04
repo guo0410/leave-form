@@ -7,7 +7,7 @@
   <title>請假申請系統</title>
   <style>
     body {
-      background: linear-gradient(to bottom right, #ffe6ec, #fff8fa);
+      background: linear-gradient(to bottom right, #ffe6ec, #f0f6ff);
       font-family: "Noto Sans TC", sans-serif;
       color: #333;
       margin: 0;
@@ -25,18 +25,24 @@
     }
     main {
       margin: 40px auto;
-      max-width: 700px;
+      max-width: 750px;
       background: #ffffff;
       padding: 40px;
       border-radius: 20px;
       box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     }
-    input, select, button {
+    input, select, textarea, button {
       margin: 10px;
       padding: 10px 14px;
       border-radius: 10px;
       border: 1px solid #ccc;
       font-size: 15px;
+      width: 70%;
+      max-width: 300px;
+    }
+    textarea {
+      height: 80px;
+      resize: none;
     }
     button {
       border: none;
@@ -51,11 +57,11 @@
       background-color: #ffadc0;
     }
     .btn-admin {
-      background-color: #ffe2e8;
-      color: #5c1e33;
+      background-color: #d7e9ff;
+      color: #233a5c;
     }
     .btn-admin:hover {
-      background-color: #ffd2db;
+      background-color: #c2dcff;
     }
     section {
       margin-bottom: 30px;
@@ -64,10 +70,13 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      background-color: #fafafa;
+      border-radius: 10px;
+      overflow: hidden;
     }
     th, td {
       border-bottom: 1px solid #ddd;
-      padding: 8px;
+      padding: 10px;
     }
     th {
       background-color: #ffe8ef;
@@ -94,19 +103,19 @@
       <div style="border:1px solid #ffc4d0; border-radius:15px; padding:20px; margin-bottom:30px;">
         <h3>一般使用者登入</h3>
         <form id="userLoginForm">
-          <label>姓名：</label>
+          <label>姓名：</label><br>
           <input type="text" id="userName" placeholder="請輸入姓名" required><br>
           <button type="submit" class="btn-main">登入</button>
         </form>
       </div>
 
 ```
-  <div style="border:1px solid #ffdbe2; border-radius:15px; padding:20px;">
+  <div style="border:1px solid #d7e9ff; border-radius:15px; padding:20px;">
     <h3>管理者登入</h3>
     <form id="adminLoginForm">
-      <label>帳號：</label>
+      <label>帳號：</label><br>
       <input type="text" id="adminAccount" placeholder="輸入帳號" required><br>
-      <label>密碼：</label>
+      <label>密碼：</label><br>
       <input type="password" id="adminPassword" placeholder="輸入密碼" required><br>
       <button type="submit" class="btn-admin">登入</button>
     </form>
@@ -117,16 +126,16 @@
 <section id="leaveSection" style="display:none">
   <h2>請假申請</h2>
   <form id="leaveForm">
-    <label>姓名：</label>
+    <label>姓名：</label><br>
     <input type="text" id="name" readonly><br>
 
-    <label>開始日期：</label>
+    <label>開始日期：</label><br>
     <input type="date" id="startDate" required><br>
 
-    <label>結束日期：</label>
+    <label>結束日期：</label><br>
     <input type="date" id="endDate" required><br>
 
-    <label>假別：</label>
+    <label>假別：</label><br>
     <select id="reason" required>
       <option value="事假">事假</option>
       <option value="病假">病假</option>
@@ -137,6 +146,9 @@
       <option value="補休">補休</option>
       <option value="特休">特休</option>
     </select><br>
+
+    <label>原因（必填）：</label><br>
+    <textarea id="details" placeholder="請說明請假原因" required></textarea><br>
 
     <button type="submit" class="btn-main">送出申請</button>
   </form>
@@ -149,6 +161,7 @@
         <th>開始日期</th>
         <th>結束日期</th>
         <th>假別</th>
+        <th>原因</th>
         <th>送出時間</th>
       </tr>
     </thead>
@@ -170,6 +183,7 @@
         <th>開始日期</th>
         <th>結束日期</th>
         <th>假別</th>
+        <th>原因</th>
         <th>送出時間</th>
       </tr>
     </thead>
@@ -221,14 +235,12 @@
       }
     });
 
-    // 使用者登出
+    // 登出
     logoutBtn.addEventListener('click', () => {
       currentUser = null;
       leaveSection.style.display = 'none';
       loginSection.style.display = 'block';
     });
-
-    // 管理者登出
     adminLogoutBtn.addEventListener('click', () => {
       currentUser = null;
       adminSection.style.display = 'none';
@@ -242,7 +254,8 @@
         name: document.getElementById('name').value,
         start_date: document.getElementById('startDate').value,
         end_date: document.getElementById('endDate').value,
-        reason: document.getElementById('reason').value
+        reason: document.getElementById('reason').value,
+        details: document.getElementById('details').value
       };
       const res = await fetch(API_URL, {
         method: 'POST',
@@ -254,7 +267,7 @@
       fetchUserRecords(data.name);
     });
 
-    // 使用者紀錄
+    // 撈使用者紀錄
     async function fetchUserRecords(name) {
       const res = await fetch(API_URL);
       const data = await res.json();
@@ -266,14 +279,15 @@
           <td>${record.name}</td>
           <td>${record.start_date}</td>
           <td>${record.end_date}</td>
-          <td class=\"type-${record.reason}\">${record.reason}</td>
+          <td class="type-${record.reason}">${record.reason}</td>
+          <td>${record.details || ''}</td>
           <td>${record.submit_time}</td>
         `;
         tableBody.appendChild(tr);
       });
     }
 
-    // 管理者紀錄
+    // 撈管理員紀錄
     async function fetchAdminRecords() {
       const res = await fetch(API_URL);
       const data = await res.json();
@@ -285,7 +299,8 @@
           <td>${record.name}</td>
           <td>${record.start_date}</td>
           <td>${record.end_date}</td>
-          <td class=\"type-${record.reason}\">${record.reason}</td>
+          <td class="type-${record.reason}">${record.reason}</td>
+          <td>${record.details || ''}</td>
           <td>${record.submit_time}</td>
         `;
         tableBody.appendChild(tr);
