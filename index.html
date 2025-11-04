@@ -6,14 +6,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>請假申請系統</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #ffe8ef, #fff9fb);
+      font-family: "Noto Sans TC", sans-serif;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #ffc7d1;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #6b2f45;
+      margin: 0;
+    }
+    main {
+      margin: 40px auto;
+      max-width: 800px;
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      margin: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+    .btn-main {
+      background-color: #ffb6c1;
+      color: #551a2b;
+      border: none;
+    }
+    .btn-main:hover {
+      background-color: #ffa4b4;
+      cursor: pointer;
+    }
+    .btn-admin {
+      background-color: #ffd8e2;
+      color: #551a2b;
+      border: none;
+    }
+    .btn-admin:hover {
+      background-color: #ffc2d1;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background-color: #ffe3ea;
+    }
+    .type-事假 { background-color: #fff6cc; }
+    .type-病假 { background-color: #ffcfcf; }
+    .type-公假 { background-color: #d8f5e2; }
+    .type-喪假 { background-color: #e6e6e6; }
+    .type-婚假 { background-color: #f9e0ff; }
+    .type-年假 { background-color: #fce1a8; }
+    .type-補休 { background-color: #d0f0ff; }
+    .type-特休 { background-color: #ffe4e1; }
+  </style>
 </head>
 <body>
   <header>
     <h1>請假申請系統</h1>
-    <nav>
-      <button id="loginBtn">登入</button>
-      <button id="logoutBtn" style="display:none">登出</button>
-    </nav>
   </header>
 
   <main>
@@ -25,8 +93,10 @@
         <input type="text" id="username" placeholder="輸入帳號" required><br>
         <label>密碼：</label>
         <input type="password" id="password" placeholder="輸入密碼" required><br>
-        <button type="submit" class="btn-primary">登入</button>
+        <button type="submit" class="btn-main">使用者登入</button>
       </form>
+      <p>—— 或 ——</p>
+      <button id="adminLoginBtn" class="btn-admin">管理者登入</button>
     </section>
 
 ```
@@ -48,10 +118,14 @@
       <option value="事假">事假</option>
       <option value="病假">病假</option>
       <option value="公假">公假</option>
-      <option value="其他">其他</option>
+      <option value="喪假">喪假</option>
+      <option value="婚假">婚假</option>
+      <option value="年假">年假</option>
+      <option value="補休">補休</option>
+      <option value="特休">特休</option>
     </select><br>
 
-    <button type="submit" class="btn-success">送出申請</button>
+    <button type="submit" class="btn-main">送出申請</button>
   </form>
 
   <h3>請假紀錄</h3>
@@ -67,6 +141,7 @@
     </thead>
     <tbody></tbody>
   </table>
+  <button id="logoutBtn" class="btn-admin">登出</button>
 </section>
 
 <!-- 管理員介面 -->
@@ -74,7 +149,7 @@
   <h2>管理者介面</h2>
   <label>篩選日期：</label>
   <input type="date" id="filterDate">
-  <button id="filterBtn" class="btn-primary">篩選</button>
+  <button id="filterBtn" class="btn-main">篩選</button>
   <table id="adminTable">
     <thead>
       <tr>
@@ -87,6 +162,7 @@
     </thead>
     <tbody></tbody>
   </table>
+  <button id="adminLogoutBtn" class="btn-admin">登出</button>
 </section>
 ```
 
@@ -99,38 +175,51 @@
     const loginSection = document.getElementById('loginSection');
     const leaveSection = document.getElementById('leaveSection');
     const adminSection = document.getElementById('adminSection');
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 
     let currentUser = null;
 
+    // 使用者登入
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      if (username === 'cyut' && password === '001') {
+      currentUser = username;
+      loginSection.style.display = 'none';
+      leaveSection.style.display = 'block';
+      document.getElementById('name').value = username;
+      fetchUserRecords(username);
+    });
+
+    // 管理員登入
+    adminLoginBtn.addEventListener('click', () => {
+      const account = prompt('請輸入管理者帳號：');
+      const password = prompt('請輸入密碼：');
+      if (account === 'cyut' && password === '001') {
         currentUser = 'admin';
         loginSection.style.display = 'none';
         adminSection.style.display = 'block';
-        logoutBtn.style.display = 'inline-block';
         fetchAdminRecords();
       } else {
-        currentUser = username;
-        loginSection.style.display = 'none';
-        leaveSection.style.display = 'block';
-        document.getElementById('name').value = username;
-        logoutBtn.style.display = 'inline-block';
-        fetchUserRecords(username);
+        alert('帳號或密碼錯誤');
       }
     });
 
+    // 登出按鈕
     logoutBtn.addEventListener('click', () => {
       currentUser = null;
-      loginSection.style.display = 'block';
       leaveSection.style.display = 'none';
-      adminSection.style.display = 'none';
-      logoutBtn.style.display = 'none';
+      loginSection.style.display = 'block';
     });
 
+    adminLogoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      adminSection.style.display = 'none';
+      loginSection.style.display = 'block';
+    });
+
+    // 請假申請
     leaveForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
@@ -149,6 +238,7 @@
       fetchUserRecords(data.name);
     });
 
+    // 撈使用者紀錄
     async function fetchUserRecords(name) {
       const res = await fetch(API_URL);
       const data = await res.json();
@@ -160,13 +250,14 @@
           <td>${record.name}</td>
           <td>${record.start_date}</td>
           <td>${record.end_date}</td>
-          <td class="type-${record.reason}">${record.reason}</td>
+          <td class=\"type-${record.reason}\">${record.reason}</td>
           <td>${record.submit_time}</td>
         `;
         tableBody.appendChild(tr);
       });
     }
 
+    // 撈管理員紀錄
     async function fetchAdminRecords() {
       const res = await fetch(API_URL);
       const data = await res.json();
@@ -178,7 +269,7 @@
           <td>${record.name}</td>
           <td>${record.start_date}</td>
           <td>${record.end_date}</td>
-          <td class="type-${record.reason}">${record.reason}</td>
+          <td class=\"type-${record.reason}\">${record.reason}</td>
           <td>${record.submit_time}</td>
         `;
         tableBody.appendChild(tr);
