@@ -187,6 +187,7 @@
     const adminSection = document.getElementById('adminSection');
     const logoutBtn = document.getElementById('logoutBtn');
     const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+    const filterBtn = document.getElementById('filterBtn');
     let currentUser = null;
 
     userLoginForm.addEventListener('submit', (e) => {
@@ -279,9 +280,43 @@
         tableBody.appendChild(tr);
       });
     }
+
+    filterBtn.addEventListener('click', async () => {
+      const date = document.getElementById('filterDate').value;
+      if (!date) {
+        alert("請先選擇日期！");
+        return;
+      }
+
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const tableBody = document.querySelector('#adminTable tbody');
+      tableBody.innerHTML = '';
+
+      (data.leaves || [])
+        .filter(record => (record.start_date <= date && record.end_date >= date))
+        .forEach(record => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${record.name}</td>
+            <td>${record.start_date}</td>
+            <td>${record.end_date}</td>
+            <td class="type-${record.reason}">${record.reason}</td>
+            <td>${record.details || ''}</td>
+            <td>${record.submit_time}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+
+      if (tableBody.innerHTML === '') {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="6">這天沒有任何請假紀錄</td>`;
+        tableBody.appendChild(tr);
+      }
+    });
   </script>
 
-  <!-- LIFF SDK（已整合你的 ID） -->
+  <!-- LIFF SDK -->
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
