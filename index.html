@@ -7,16 +7,16 @@
   <title>請假申請系統</title>
   <style>
     body {
-      background: linear-gradient(to bottom right, #ebebeb, #ffffff);
+      background: linear-gradient(to bottom right, #f2f2f2, #ffffff);
       font-family: "Noto Sans TC", sans-serif;
       color: #333;
       margin: 0;
       padding: 0;
       text-align: center;
     }
-    /* 標題背景改為稍深灰色 */
+    /* 灰色為主的標題 */
     header {
-      background-color: #cccccc;
+      background-color: #e6e6e6;
       padding: 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
@@ -37,7 +37,7 @@
       margin: 10px;
       padding: 10px 14px;
       border-radius: 10px;
-      border: 1px solid #bbb;
+      border: 1px solid #ccc;
       font-size: 15px;
       width: 70%;
       max-width: 300px;
@@ -51,6 +51,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
+    /* 粉色主按鈕 */
     .btn-main {
       background-color: #ffc4d0;
       color: #5c1e33;
@@ -58,12 +59,13 @@
     .btn-main:hover {
       background-color: #ffadc0;
     }
+    /* 藍灰管理員按鈕 */
     .btn-admin {
-      background-color: #d0def0;
+      background-color: #d7e9ff;
       color: #233a5c;
     }
     .btn-admin:hover {
-      background-color: #bfcde3;
+      background-color: #c2dcff;
     }
     section {
       margin-bottom: 30px;
@@ -81,8 +83,9 @@
       padding: 10px;
     }
     th {
-      background-color: #e0e0e0;
+      background-color: #efefef;
     }
+    /* 假別顏色 */
     .type-事假 { background-color: #fff7c4; }
     .type-病假 { background-color: #ffcfcf; }
     .type-公假 { background-color: #c9f5d6; }
@@ -99,6 +102,7 @@
   </header>
 
   <main>
+    <!-- 登入畫面 -->
     <section id="loginSection">
       <h2>登入系統</h2>
       <div style="border:1px solid #ccc; border-radius:15px; padding:20px; margin-bottom:30px;">
@@ -123,6 +127,7 @@
   </div>
 </section>
 
+<!-- 使用者介面 -->
 <section id="leaveSection" style="display:none">
   <h2>請假申請</h2>
   <form id="leaveForm">
@@ -170,6 +175,7 @@
   <button id="logoutBtn" class="btn-admin">登出</button>
 </section>
 
+<!-- 管理員介面 -->
 <section id="adminSection" style="display:none">
   <h2>管理者介面</h2>
   <label>篩選日期：</label>
@@ -193,5 +199,113 @@
 ```
 
   </main>
+
+  <script>
+    const API_URL = 'https://4na3z7voxk.execute-api.ap-southeast-2.amazonaws.com/prod/leave';
+
+    const userLoginForm = document.getElementById('userLoginForm');
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    const leaveForm = document.getElementById('leaveForm');
+    const loginSection = document.getElementById('loginSection');
+    const leaveSection = document.getElementById('leaveSection');
+    const adminSection = document.getElementById('adminSection');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+
+    let currentUser = null;
+
+    userLoginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('userName').value;
+      currentUser = name;
+      loginSection.style.display = 'none';
+      leaveSection.style.display = 'block';
+      document.getElementById('name').value = name;
+      fetchUserRecords(name);
+    });
+
+    adminLoginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const account = document.getElementById('adminAccount').value;
+      const password = document.getElementById('adminPassword').value;
+      if (account === 'cyut' && password === '001') {
+        currentUser = 'admin';
+        loginSection.style.display = 'none';
+        adminSection.style.display = 'block';
+        fetchAdminRecords();
+      } else {
+        alert('帳號或密碼錯誤');
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      leaveSection.style.display = 'none';
+      loginSection.style.display = 'block';
+    });
+    adminLogoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      adminSection.style.display = 'none';
+      loginSection.style.display = 'block';
+    });
+
+    leaveForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('name').value,
+        start_date: document.getElementById('startDate').value,
+        end_date: document.getElementById('endDate').value,
+        reason: document.getElementById('reason').value,
+        details: document.getElementById('details').value
+      };
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      alert(result.message);
+      fetchUserRecords(data.name);
+    });
+
+    async function fetchUserRecords(name) {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const tableBody = document.querySelector('#recordTable tbody');
+      tableBody.innerHTML = '';
+      data.leaves.filter(l => l.name === name).forEach(record => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${record.name}</td>
+          <td>${record.start_date}</td>
+          <td>${record.end_date}</td>
+          <td class="type-${record.reason}">${record.reason}</td>
+          <td>${record.details || ''}</td>
+          <td>${record.submit_time}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    async function fetchAdminRecords() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const tableBody = document.querySelector('#adminTable tbody');
+      tableBody.innerHTML = '';
+      data.leaves.forEach(record => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${record.name}</td>
+          <td>${record.start_date}</td>
+          <td>${record.end_date}</td>
+          <td class="type-${record.reason}">${record.reason}</td>
+          <td>${record.details || ''}</td>
+          <td>${record.submit_time}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+  </script>
+
 </body>
 </html>
