@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>請假申請系統</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>請假申請系統</h1>
+    <nav>
+      <button id="loginBtn">登入</button>
+      <button id="logoutBtn" style="display:none">登出</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 登入畫面 -->
+    <section id="loginSection">
+      <h2>登入系統</h2>
+      <form id="loginForm">
+        <label>帳號：</label>
+        <input type="text" id="username" placeholder="輸入帳號" required><br>
+        <label>密碼：</label>
+        <input type="password" id="password" placeholder="輸入密碼" required><br>
+        <button type="submit" class="btn-primary">登入</button>
+      </form>
+    </section>
+
+```
+<!-- 使用者介面 -->
+<section id="leaveSection" style="display:none">
+  <h2>請假申請</h2>
+  <form id="leaveForm">
+    <label>姓名：</label>
+    <input type="text" id="name" placeholder="輸入姓名" required><br>
+
+    <label>開始日期：</label>
+    <input type="date" id="startDate" required><br>
+
+    <label>結束日期：</label>
+    <input type="date" id="endDate" required><br>
+
+    <label>假別：</label>
+    <select id="reason" required>
+      <option value="事假">事假</option>
+      <option value="病假">病假</option>
+      <option value="公假">公假</option>
+      <option value="其他">其他</option>
+    </select><br>
+
+    <button type="submit" class="btn-success">送出申請</button>
+  </form>
+
+  <h3>請假紀錄</h3>
+  <table id="recordTable">
+    <thead>
+      <tr>
+        <th>姓名</th>
+        <th>開始日期</th>
+        <th>結束日期</th>
+        <th>假別</th>
+        <th>送出時間</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<!-- 管理員介面 -->
+<section id="adminSection" style="display:none">
+  <h2>管理者介面</h2>
+  <label>篩選日期：</label>
+  <input type="date" id="filterDate">
+  <button id="filterBtn" class="btn-primary">篩選</button>
+  <table id="adminTable">
+    <thead>
+      <tr>
+        <th>姓名</th>
+        <th>開始日期</th>
+        <th>結束日期</th>
+        <th>假別</th>
+        <th>送出時間</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+```
+
+  </main>
+
+  <script>
+    const API_URL = 'https://4na3z7voxk.execute-api.ap-southeast-2.amazonaws.com/prod/leave';
+    const loginForm = document.getElementById('loginForm');
+    const leaveForm = document.getElementById('leaveForm');
+    const loginSection = document.getElementById('loginSection');
+    const leaveSection = document.getElementById('leaveSection');
+    const adminSection = document.getElementById('adminSection');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    let currentUser = null;
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      if (username === 'cyut' && password === '001') {
+        currentUser = 'admin';
+        loginSection.style.display = 'none';
+        adminSection.style.display = 'block';
+        logoutBtn.style.display = 'inline-block';
+        fetchAdminRecords();
+      } else {
+        currentUser = username;
+        loginSection.style.display = 'none';
+        leaveSection.style.display = 'block';
+        document.getElementById('name').value = username;
+        logoutBtn.style.display = 'inline-block';
+        fetchUserRecords(username);
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      currentUser = null;
+      loginSection.style.display = 'block';
+      leaveSection.style.display = 'none';
+      adminSection.style.display = 'none';
+      logoutBtn.style.display = 'none';
+    });
+
+    leaveForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('name').value,
+        start_date: document.getElementById('startDate').value,
+        end_date: document.getElementById('endDate').value,
+        reason: document.getElementById('reason').value
+      };
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      alert(result.message);
+      fetchUserRecords(data.name);
+    });
+
+    async function fetchUserRecords(name) {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const tableBody = document.querySelector('#recordTable tbody');
+      tableBody.innerHTML = '';
+      data.leaves.filter(l => l.name === name).forEach(record => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${record.name}</td>
+          <td>${record.start_date}</td>
+          <td>${record.end_date}</td>
+          <td class="type-${record.reason}">${record.reason}</td>
+          <td>${record.submit_time}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    async function fetchAdminRecords() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const tableBody = document.querySelector('#adminTable tbody');
+      tableBody.innerHTML = '';
+      data.leaves.forEach(record => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${record.name}</td>
+          <td>${record.start_date}</td>
+          <td>${record.end_date}</td>
+          <td class="type-${record.reason}">${record.reason}</td>
+          <td>${record.submit_time}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+  </script>
+
+</body>
+</html>
