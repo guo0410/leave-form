@@ -7,21 +7,23 @@
   <title>請假申請系統</title>
   <style>
     body {
-      background: linear-gradient(to bottom right, #ffe6ec, #f0f6ff);
+      background: linear-gradient(to bottom right, #f2f2f2, #ffffff);
       font-family: "Noto Sans TC", sans-serif;
       color: #333;
       margin: 0;
       padding: 0;
       text-align: center;
     }
+    /* 灰色為主的標題 */
     header {
-      background-color: #ffb6c1;
+      background-color: #e6e6e6;
       padding: 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     h1 {
-      color: #666666; /* 改為淺灰色 */
+      color: #000;
       margin: 0;
+      letter-spacing: 1px;
     }
     main {
       margin: 40px auto;
@@ -49,6 +51,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
+    /* 粉色主按鈕 */
     .btn-main {
       background-color: #ffc4d0;
       color: #5c1e33;
@@ -56,6 +59,7 @@
     .btn-main:hover {
       background-color: #ffadc0;
     }
+    /* 藍灰管理員按鈕 */
     .btn-admin {
       background-color: #d7e9ff;
       color: #233a5c;
@@ -70,7 +74,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background-color: #fafafa;
+      background-color: #f9f9f9;
       border-radius: 10px;
       overflow: hidden;
     }
@@ -79,8 +83,9 @@
       padding: 10px;
     }
     th {
-      background-color: #ffe8ef;
+      background-color: #efefef;
     }
+    /* 假別顏色 */
     .type-事假 { background-color: #fff7c4; }
     .type-病假 { background-color: #ffcfcf; }
     .type-公假 { background-color: #c9f5d6; }
@@ -100,7 +105,7 @@
     <!-- 登入畫面 -->
     <section id="loginSection">
       <h2>登入系統</h2>
-      <div style="border:1px solid #ffc4d0; border-radius:15px; padding:20px; margin-bottom:30px;">
+      <div style="border:1px solid #ccc; border-radius:15px; padding:20px; margin-bottom:30px;">
         <h3>一般使用者登入</h3>
         <form id="userLoginForm">
           <label>姓名：</label><br>
@@ -110,7 +115,7 @@
       </div>
 
 ```
-  <div style="border:1px solid #d7e9ff; border-radius:15px; padding:20px;">
+  <div style="border:1px solid #ccd6e0; border-radius:15px; padding:20px;">
     <h3>管理者登入</h3>
     <form id="adminLoginForm">
       <label>帳號：</label><br>
@@ -209,7 +214,6 @@
 
     let currentUser = null;
 
-    // 使用者登入
     userLoginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = document.getElementById('userName').value;
@@ -220,7 +224,6 @@
       fetchUserRecords(name);
     });
 
-    // 管理者登入
     adminLoginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const account = document.getElementById('adminAccount').value;
@@ -235,7 +238,6 @@
       }
     });
 
-    // 登出
     logoutBtn.addEventListener('click', () => {
       currentUser = null;
       leaveSection.style.display = 'none';
@@ -247,7 +249,6 @@
       loginSection.style.display = 'block';
     });
 
-    // 使用者送出請假
     leaveForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
@@ -267,7 +268,6 @@
       fetchUserRecords(data.name);
     });
 
-    // 撈使用者紀錄
     async function fetchUserRecords(name) {
       const res = await fetch(API_URL);
       const data = await res.json();
@@ -287,7 +287,6 @@
       });
     }
 
-    // 撈管理員紀錄
     async function fetchAdminRecords() {
       const res = await fetch(API_URL);
       const data = await res.json();
