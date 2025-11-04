@@ -1,0 +1,89 @@
+/* style.css */
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background-color: #f7f9fb;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #cfe9ff;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+h1 {
+  margin: 0;
+  color: #2a5079;
+}
+
+main {
+  margin: 20px auto;
+  max-width: 800px;
+  background: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+input, select, button {
+  margin: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #a9d1ff;
+  color: #003366;
+}
+
+.btn-success {
+  background-color: #b8f1c1;
+  color: #005a28;
+}
+
+.btn-danger {
+  background-color: #fbc0c0;
+  color: #730000;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border-bottom: 1px solid #ccc;
+  padding: 8px;
+}
+
+th {
+  background-color: #f2f5f7;
+}
+
+.type-事假 {
+  background-color: #fff1c1;
+}
+.type-病假 {
+  background-color: #ffcfcf;
+}
+.type-公假 {
+  background-color: #c9f3d2;
+}
+.type-其他 {
+  background-color: #d9e3ff;
+}
