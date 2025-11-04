@@ -190,6 +190,10 @@
     const filterBtn = document.getElementById('filterBtn');
     let currentUser = null;
 
+    const formatTime = (timeStr) => {
+      return timeStr ? timeStr.replace("T", " ").split("+")[0] : '';
+    };
+
     userLoginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = document.getElementById('userName').value.trim();
@@ -258,7 +262,7 @@
           <td>${record.end_date}</td>
           <td class="type-${record.reason}">${record.reason}</td>
           <td>${record.details || ''}</td>
-          <td>${record.submit_time}</td>`;
+          <td>${formatTime(record.submit_time)}</td>`;
         tableBody.appendChild(tr);
       });
     }
@@ -276,7 +280,7 @@
           <td>${record.end_date}</td>
           <td class="type-${record.reason}">${record.reason}</td>
           <td>${record.details || ''}</td>
-          <td>${record.submit_time}</td>`;
+          <td>${formatTime(record.submit_time)}</td>`;
         tableBody.appendChild(tr);
       });
     }
@@ -303,7 +307,7 @@
             <td>${record.end_date}</td>
             <td class="type-${record.reason}">${record.reason}</td>
             <td>${record.details || ''}</td>
-            <td>${record.submit_time}</td>
+            <td>${formatTime(record.submit_time)}</td>
           `;
           tableBody.appendChild(tr);
         });
