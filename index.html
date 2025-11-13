@@ -14,16 +14,19 @@
       padding: 0;
       text-align: center;
     }
+
     header {
       background-color: #bfbfbf;
       padding: 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
+
     h1 {
       color: #000;
       margin: 0;
       letter-spacing: 1px;
     }
+
     main {
       margin: 40px auto;
       max-width: 750px;
@@ -32,6 +35,7 @@
       border-radius: 20px;
       box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     }
+
     input, select, textarea, button {
       margin: 10px;
       padding: 10px 14px;
@@ -41,18 +45,23 @@
       width: 70%;
       max-width: 300px;
     }
+
     textarea { height: 80px; resize: none; }
+
     button {
       border: none;
       cursor: pointer;
       transition: all 0.2s ease;
     }
+
     .btn-main { background-color: #ffc4d0; color: #5c1e33; }
     .btn-main:hover { background-color: #ffadc0; }
+
     .btn-admin { background-color: #d0def0; color: #233a5c; }
     .btn-admin:hover { background-color: #bfcde3; }
 
     section { margin-bottom: 30px; }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -61,163 +70,172 @@
       border-radius: 10px;
       overflow: hidden;
     }
+
     th, td { border-bottom: 1px solid #ddd; padding: 10px; }
     th { background-color: #e0e0e0; }
 
-    /* 假別顏色 */
-    .type-事假 { background-color: #fff7c4; }
-    .type-病假 { background-color: #ffcfcf; }
-    .type-公假 { background-color: #c9f5d6; }
-    .type-喪假 { background-color: #e6e6e6; }
-    .type-婚假 { background-color: #f7dcff; }
-    .type-年假 { background-color: #fce2a5; }
-    .type-補休 { background-color: #d6f2ff; }
-    .type-特休 { background-color: #ffe5e1; }
+    /* ⭐ 假別漸層（精緻柔和灰藍粉） */
+    .type-事假 { background: linear-gradient(to right, #fff3b8, #ffeaa0); }
+    .type-病假 { background: linear-gradient(to right, #ffd6d6, #ffbcbc); }
+    .type-公假 { background: linear-gradient(to right, #d8f7e4, #c2f0d5); }
+    .type-喪假 { background: linear-gradient(to right, #e6e6e6, #d8d8d8); }
+    .type-婚假 { background: linear-gradient(to right, #f7e4ff, #e8ccff); }
+    .type-年假 { background: linear-gradient(to right, #ffeab3, #ffd98c); }
+    .type-補休 { background: linear-gradient(to right, #dff2ff, #c7e8ff); }
+    .type-特休 { background: linear-gradient(to right, #ffe5e5, #ffc9c9); }
 
-    /* 狀態顏色 */
+    /* 審核狀態顯示 */
     .status-pending { color: gray; font-weight: bold; }
     .status-approved { color: green; font-weight: bold; }
     .status-rejected { color: red; font-weight: bold; }
+
   </style>
 </head>
 
 <body>
-<header>
-  <h1>請假申請系統</h1>
-</header>
+  <header>
+    <h1>請假申請系統</h1>
+  </header>
 
-<main>
+  <main>
 
-<!-- 使用者與管理者登入 -->
-<section id="loginSection">
-  <h2>登入系統</h2>
+    <!-- 登入區 -->
+    <section id="loginSection">
+      <h2>登入系統</h2>
 
-  <!-- 使用者登入 -->
-  <div style="border:1px solid #ccc; border-radius:15px; padding:20px; margin-bottom:30px;">
-    <h3>一般使用者登入</h3>
-    <form id="userLoginForm">
-      <label>姓名：</label><br>
-      <input type="text" id="userName" placeholder="請輸入姓名" required><br>
-      <button type="submit" class="btn-main">登入</button>
-    </form>
-    <p style="font-size:12px;color:#666;">（從 LINE 開啟會自動帶入姓名）</p>
-  </div>
+      <!-- 使用者 -->
+      <div style="border:1px solid #ccc; border-radius:15px; padding:20px; margin-bottom:30px;">
+        <h3>一般使用者登入</h3>
+        <form id="userLoginForm">
+          <label>姓名：</label><br />
+          <input type="text" id="userName" placeholder="請輸入姓名" required /><br />
+          <button type="submit" class="btn-main">登入</button>
+        </form>
+        <p style="font-size:12px;color:#666;margin-top:6px;">（從 LINE 開啟會自動帶入姓名）</p>
+      </div>
 
-  <!-- 管理者登入 -->
-  <div style="border:1px solid #ccd6e0; border-radius:15px; padding:20px;">
-    <h3>管理者登入</h3>
-    <form id="adminLoginForm">
-      <label>帳號：</label><br>
-      <input type="text" id="adminAccount" placeholder="輸入帳號" required><br>
-      <label>密碼：</label><br>
-      <input type="password" id="adminPassword" placeholder="輸入密碼" required><br>
-      <button type="submit" class="btn-admin">登入</button>
-    </form>
-  </div>
+      <!-- 管理員 -->
+      <div style="border:1px solid #ccd6e0; border-radius:15px; padding:20px;">
+        <h3>管理者登入</h3>
+        <form id="adminLoginForm">
+          <label>帳號：</label><br />
+          <input type="text" id="adminAccount" placeholder="輸入帳號" required /><br />
 
-</section>
+          <label>密碼：</label><br />
+          <input type="password" id="adminPassword" placeholder="輸入密碼" required /><br />
 
-<!-- 使用者請假頁面 -->
-<section id="leaveSection" style="display:none">
-  <h2>請假申請</h2>
+          <button type="submit" class="btn-admin">登入</button>
+        </form>
+      </div>
+    </section>
 
-  <form id="leaveForm">
-    <label>姓名：</label><br>
-    <input type="text" id="name" readonly><br>
+    <!-- 使用者請假 -->
+    <section id="leaveSection" style="display:none">
+      <h2>請假申請</h2>
 
-    <label>開始日期：</label><br>
-    <input type="date" id="startDate" required><br>
+      <form id="leaveForm">
+        <label>姓名：</label><br />
+        <input type="text" id="name" readonly /><br />
 
-    <label>結束日期：</label><br>
-    <input type="date" id="endDate" required><br>
+        <label>開始日期：</label><br />
+        <input type="date" id="startDate" required /><br />
 
-    <label>假別：</label><br>
-    <select id="reason" required>
-      <option value="事假">事假</option>
-      <option value="病假">病假</option>
-      <option value="公假">公假</option>
-      <option value="喪假">喪假</option>
-      <option value="婚假">婚假</option>
-      <option value="年假">年假</option>
-      <option value="補休">補休</option>
-      <option value="特休">特休</option>
-    </select><br>
+        <label>結束日期：</label><br />
+        <input type="date" id="endDate" required /><br />
 
-    <label>原因（必填）：</label><br>
-    <textarea id="details" required placeholder="請說明請假原因"></textarea><br>
+        <label>假別：</label><br />
+        <select id="reason" required>
+          <option value="事假">事假</option>
+          <option value="病假">病假</option>
+          <option value="公假">公假</option>
+          <option value="喪假">喪假</option>
+          <option value="婚假">婚假</option>
+          <option value="年假">年假</option>
+          <option value="補休">補休</option>
+          <option value="特休">特休</option>
+        </select><br />
 
-    <button type="submit" class="btn-main">送出申請</button>
-  </form>
+        <label>原因（必填）：</label><br />
+        <textarea id="details" placeholder="請說明請假原因" required></textarea><br />
 
-  <h3>請假紀錄</h3>
-  <table id="recordTable">
-    <thead>
-      <tr>
-        <th>姓名</th>
-        <th>開始</th>
-        <th>結束</th>
-        <th>假別</th>
-        <th>原因</th>
-        <th>送出時間</th>
-        <th>狀態</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+        <!-- ⭐ 新增請假天數 -->
+        <label>請假天數：</label><br />
+        <input type="text" id="daysCount" readonly style="background:#f4f4f4;"><br />
 
-  <button id="logoutBtn" class="btn-admin">登出</button>
-</section>
+        <button type="submit" class="btn-main">送出申請</button>
+      </form>
 
-<!-- 管理者頁面 -->
-<section id="adminSection" style="display:none">
-  <h2>管理者介面</h2>
+      <h3>請假紀錄</h3>
+      <table id="recordTable">
+        <thead>
+          <tr>
+            <th>姓名</th>
+            <th>開始</th>
+            <th>結束</th>
+            <th>假別</th>
+            <th>原因</th>
+            <th>天數</th>
+            <th>送出時間</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
 
-  <label>篩選日期：</label>
-  <input type="date" id="filterDate">
-  <button id="filterBtn" class="btn-main">篩選</button>
+      <button id="logoutBtn" class="btn-admin">登出</button>
+    </section>
 
-  <table id="adminTable">
-    <thead>
-      <tr>
-        <th>姓名</th>
-        <th>開始</th>
-        <th>結束</th>
-        <th>假別</th>
-        <th>原因</th>
-        <th>送出時間</th>
-        <th>狀態</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<!-- =========================== -->
+<!-- ⭐ JavaScript 功能開始 ⭐     -->
+<!-- =========================== -->
 
-  <button id="adminLogoutBtn" class="btn-admin">登出</button>
-</section>
-
-</main>
-
-<!-- 前端 JS -->
 <script>
+  /* ---------------- API URL ---------------- */
   const API_LEAVE = "https://4na3z7voxk.execute-api.ap-southeast-2.amazonaws.com/prod/leave";
   const API_REVIEW = "https://4na3z7voxk.execute-api.ap-southeast-2.amazonaws.com/prod/review";
 
-  const userLoginForm = document.getElementById("userLoginForm");
-  const adminLoginForm = document.getElementById("adminLoginForm");
-  const leaveForm = document.getElementById("leaveForm");
-  const loginSection = document.getElementById("loginSection");
-  const leaveSection = document.getElementById("leaveSection");
-  const adminSection = document.getElementById("adminSection");
-  const filterBtn = document.getElementById("filterBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const adminLogoutBtn = document.getElementById("adminLogoutBtn");
+  /* ---------------- DOM 元素 ---------------- */
+  const userLoginForm = document.getElementById('userLoginForm');
+  const adminLoginForm = document.getElementById('adminLoginForm');
+  const leaveForm = document.getElementById('leaveForm');
+
+  const loginSection = document.getElementById('loginSection');
+  const leaveSection = document.getElementById('leaveSection');
+  const adminSection = document.getElementById('adminSection');
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+  const filterBtn = document.getElementById('filterBtn');
 
   let currentUser = null;
 
-  const formatTime = (timeStr) =>
-    timeStr ? timeStr.replace("T", " ").split("+")[0] : "";
+  /* ---------------- 時間格式調整 ---------------- */
+  const formatTime = (t) =>
+    t ? t.replace("T", " ").split("+")[0] : "";
 
-  /* 使用者登入 */
+  /* ---------------- 自動計算天數 ---------------- */
+  function calculateDays() {
+    const s = document.getElementById("startDate").value;
+    const e = document.getElementById("endDate").value;
+    const out = document.getElementById("daysCount");
+
+    if (s && e) {
+      const start = new Date(s);
+      const end = new Date(e);
+      if (end < start) {
+        out.value = "結束不可早於開始";
+        return;
+      }
+      const diff = (end - start) / (1000 * 60 * 60 * 24) + 1;
+      out.value = diff + " 天";
+    }
+  }
+
+  document.getElementById("startDate").addEventListener("change", calculateDays);
+  document.getElementById("endDate").addEventListener("change", calculateDays);
+
+
+  /* ---------------- 使用者登入 ---------------- */
   userLoginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const name = document.getElementById("userName").value.trim();
@@ -230,34 +248,37 @@
     fetchUserRecords(name);
   });
 
-  /* 管理者登入 */
+  /* ---------------- 管理者登入 ---------------- */
   adminLoginForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    if (
-      document.getElementById("adminAccount").value === "cyut" &&
-      document.getElementById("adminPassword").value === "001"
-    ) {
+
+    const account = document.getElementById("adminAccount").value;
+    const pwd = document.getElementById("adminPassword").value;
+
+    if (account === "cyut" && pwd === "001") {
       currentUser = "admin";
       loginSection.style.display = "none";
       adminSection.style.display = "block";
       fetchAdminRecords();
     } else {
-      alert("帳號或密碼錯誤");
+      alert("帳號或密碼錯誤！");
     }
   });
 
-  /* 登出 */
+  /* ---------------- 登出 ---------------- */
   logoutBtn.addEventListener("click", () => {
-    loginSection.style.display = "block";
+    currentUser = null;
     leaveSection.style.display = "none";
-  });
-
-  adminLogoutBtn.addEventListener("click", () =>{
     loginSection.style.display = "block";
-    adminSection.style.display = "none";
   });
 
-  /* 使用者送出請假 */
+  adminLogoutBtn.addEventListener("click", () => {
+    currentUser = null;
+    adminSection.style.display = "none";
+    loginSection.style.display = "block";
+  });
+
+  /* ---------------- 送出請假 ---------------- */
   leaveForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -267,36 +288,39 @@
       end_date: document.getElementById("endDate").value,
       reason: document.getElementById("reason").value,
       details: document.getElementById("details").value,
+      days: document.getElementById("daysCount").value,
     };
 
     const res = await fetch(API_LEAVE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     });
 
     const result = await res.json();
-    alert(result.message || "已送出");
+    alert(result.message || "已送出！");
     fetchUserRecords(data.name);
   });
 
-  /* 使用者紀錄 */
+  /* ---------------- 使用者紀錄 ---------------- */
   async function fetchUserRecords(name) {
     const res = await fetch(API_LEAVE);
     const data = await res.json();
+
     const tbody = document.querySelector("#recordTable tbody");
     tbody.innerHTML = "";
 
     (data.leaves || [])
-      .filter((l) => l.name === name)
-      .forEach((record) => {
+      .filter(r => r.name === name)
+      .forEach(record => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${record.name}</td>
           <td>${record.start_date}</td>
           <td>${record.end_date}</td>
           <td class="type-${record.reason}">${record.reason}</td>
-          <td>${record.details}</td>
+          <td>${record.details || ""}</td>
+          <td>${record.days || ""}</td>
           <td>${formatTime(record.submit_time)}</td>
           <td class="status-${record.status}">${record.status || "pending"}</td>
         `;
@@ -304,21 +328,23 @@
       });
   }
 
-  /* 管理者查看所有紀錄 */
+  /* ---------------- 管理者紀錄 ---------------- */
   async function fetchAdminRecords() {
     const res = await fetch(API_LEAVE);
     const data = await res.json();
+
     const tbody = document.querySelector("#adminTable tbody");
     tbody.innerHTML = "";
 
-    (data.leaves || []).forEach((record) => {
+    (data.leaves || []).forEach(record => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${record.name}</td>
         <td>${record.start_date}</td>
         <td>${record.end_date}</td>
         <td class="type-${record.reason}">${record.reason}</td>
-        <td>${record.details}</td>
+        <td>${record.details || ""}</td>
+        <td>${record.days || ""}</td>
         <td>${formatTime(record.submit_time)}</td>
         <td class="status-${record.status}">${record.status || "pending"}</td>
         <td>
@@ -330,49 +356,49 @@
     });
   }
 
-  /* 審核功能 */
+  /* ---------------- 審核（核准 / 駁回） ---------------- */
   document.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("approve-btn"))
+    if (e.target.classList.contains("approve-btn")) {
       updateStatus(e.target.dataset.id, "approved");
-
-    if (e.target.classList.contains("reject-btn"))
+    }
+    if (e.target.classList.contains("reject-btn")) {
       updateStatus(e.target.dataset.id, "rejected");
+    }
   });
 
   async function updateStatus(id, status) {
     const res = await fetch(API_REVIEW, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
+      body: JSON.stringify({ id, status })
     });
-    const msg = await res.json();
-    alert(msg.message || "已更新");
+    const data = await res.json();
+    alert(data.message || "已更新");
     fetchAdminRecords();
   }
 
-  /* 日期篩選 */
+  /* ---------------- 日期篩選 ---------------- */
   filterBtn.addEventListener("click", async () => {
     const date = document.getElementById("filterDate").value;
-    if (!date) {
-      alert("請先選擇日期！");
-      return;
-    }
+    if (!date) return alert("請選擇日期！");
 
     const res = await fetch(API_LEAVE);
     const data = await res.json();
+
     const tbody = document.querySelector("#adminTable tbody");
     tbody.innerHTML = "";
 
     (data.leaves || [])
-      .filter((record) => record.start_date <= date && record.end_date >= date)
-      .forEach((record) => {
+      .filter(r => r.start_date <= date && r.end_date >= date)
+      .forEach(record => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${record.name}</td>
           <td>${record.start_date}</td>
           <td>${record.end_date}</td>
           <td class="type-${record.reason}">${record.reason}</td>
-          <td>${record.details}</td>
+          <td>${record.details || ""}</td>
+          <td>${record.days || ""}</td>
           <td>${formatTime(record.submit_time)}</td>
           <td class="status-${record.status}">${record.status || "pending"}</td>
           <td>
@@ -383,13 +409,18 @@
         tbody.appendChild(tr);
       });
   });
+
 </script>
 
-<!-- LIFF -->
+<!-- =========================== -->
+<!-- ⭐ LIFF SDK 登入功能 ⭐       -->
+<!-- =========================== -->
+
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
   (async function initLiffSafe() {
     const LIFF_ID = "2008420032-nzxO4ew0";
+
     try {
       await liff.init({ liffId: LIFF_ID });
 
@@ -404,13 +435,13 @@
       document.getElementById("userName").value = name;
       document.getElementById("name").value = name;
 
+      currentUser = name;
       loginSection.style.display = "none";
       leaveSection.style.display = "block";
-
       fetchUserRecords(name);
 
     } catch (err) {
-      console.warn("非 LINE 開啟或初始化失敗", err);
+      console.warn("非 LINE 開啟或 LIFF 初始化失敗：", err);
     }
   })();
 </script>
