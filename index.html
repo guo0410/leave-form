@@ -146,6 +146,10 @@
     <label>原因（必填）：</label><br>
     <textarea id="details" required placeholder="請說明請假原因"></textarea><br>
 
+    <!-- ⭐ 新增請假天數欄位 -->
+    <label>請假天數：</label><br>
+    <input type="text" id="daysCount" readonly style="background:#f5f5f5;"><br>
+
     <button type="submit" class="btn-main">送出申請</button>
   </form>
 
@@ -158,6 +162,7 @@
         <th>結束</th>
         <th>假別</th>
         <th>原因</th>
+        <th>天數</th>
         <th>送出時間</th>
         <th>狀態</th>
       </tr>
@@ -184,6 +189,7 @@
         <th>結束</th>
         <th>假別</th>
         <th>原因</th>
+        <th>天數</th>
         <th>送出時間</th>
         <th>狀態</th>
         <th>操作</th>
@@ -202,77 +208,75 @@
   const API_LEAVE = "https://4na3z7voxk.execute-api.ap-southeast-2.amazonaws.com/prod/leave";
   const API_REVIEW = "https://4na3z7voxk.execute-api.ap-southeast-2.amazonaws.com/prod/review";
 
-  const userLoginForm = document.getElementById("userLoginForm");
-  const adminLoginForm = document.getElementById("adminLoginForm");
-  const leaveForm = document.getElementById("leaveForm");
-  const loginSection = document.getElementById("loginSection");
-  const leaveSection = document.getElementById("leaveSection");
-  const adminSection = document.getElementById("adminSection");
-  const filterBtn = document.getElementById("filterBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const adminLogoutBtn = document.getElementById("adminLogoutBtn");
-
   let currentUser = null;
 
-  const formatTime = (timeStr) =>
-    timeStr ? timeStr.replace("T", " ").split("+")[0] : "";
+  const formatTime = (t) => t ? t.replace("T"," ").split("+")[0] : "";
+
+  /* ⭐ 自動計算天數功能 */
+  function calcDays() {
+    const s = document.getElementById("startDate").value;
+    const e = document.getElementById("endDate").value;
+    const out = document.getElementById("daysCount");
+
+    if (!s || !e) return;
+
+    const d1 = new Date(s);
+    const d2 = new Date(e);
+
+    if (d2 < d1) {
+      out.value = "結束日期不可早於開始";
+      return;
+    }
+
+    const diff = (d2 - d1) / (1000*60*60*24) + 1;
+    out.value = diff + " 天";
+  }
+
+  document.getElementById("startDate").addEventListener("change", calcDays);
+  document.getElementById("endDate").addEventListener("change", calcDays);
 
   /* 使用者登入 */
-  userLoginForm.addEventListener("submit", (e) => {
+  document.getElementById("userLoginForm").addEventListener("submit", (e)=>{
     e.preventDefault();
     const name = document.getElementById("userName").value.trim();
-    if (!name) return;
-
+    if(!name) return;
     currentUser = name;
-    loginSection.style.display = "none";
-    leaveSection.style.display = "block";
-    document.getElementById("name").value = name;
+    loginSection.style.display="none";
+    leaveSection.style.display="block";
+    document.getElementById("name").value=name;
     fetchUserRecords(name);
   });
 
   /* 管理者登入 */
-  adminLoginForm.addEventListener("submit", (e) => {
+  document.getElementById("adminLoginForm").addEventListener("submit",(e)=>{
     e.preventDefault();
-    if (
-      document.getElementById("adminAccount").value === "cyut" &&
-      document.getElementById("adminPassword").value === "001"
-    ) {
-      currentUser = "admin";
-      loginSection.style.display = "none";
-      adminSection.style.display = "block";
+    if(
+      document.getElementById("adminAccount").value==="cyut" &&
+      document.getElementById("adminPassword").value==="001"
+    ){
+      currentUser="admin";
+      loginSection.style.display="none";
+      adminSection.style.display="block";
       fetchAdminRecords();
-    } else {
-      alert("帳號或密碼錯誤");
-    }
-  });
-
-  /* 登出 */
-  logoutBtn.addEventListener("click", () => {
-    loginSection.style.display = "block";
-    leaveSection.style.display = "none";
-  });
-
-  adminLogoutBtn.addEventListener("click", () =>{
-    loginSection.style.display = "block";
-    adminSection.style.display = "none";
+    } else alert("帳號或密碼錯誤");
   });
 
   /* 使用者送出請假 */
-  leaveForm.addEventListener("submit", async (e) => {
+  document.getElementById("leaveForm").addEventListener("submit", async (e)=>{
     e.preventDefault();
-
     const data = {
       name: document.getElementById("name").value,
       start_date: document.getElementById("startDate").value,
       end_date: document.getElementById("endDate").value,
       reason: document.getElementById("reason").value,
       details: document.getElementById("details").value,
+      days: document.getElementById("daysCount").value
     };
 
-    const res = await fetch(API_LEAVE, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+    const res = await fetch(API_LEAVE,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify(data)
     });
 
     const result = await res.json();
@@ -281,103 +285,103 @@
   });
 
   /* 使用者紀錄 */
-  async function fetchUserRecords(name) {
+  async function fetchUserRecords(name){
     const res = await fetch(API_LEAVE);
     const data = await res.json();
+
     const tbody = document.querySelector("#recordTable tbody");
-    tbody.innerHTML = "";
+    tbody.innerHTML="";
 
     (data.leaves || [])
-      .filter((l) => l.name === name)
-      .forEach((record) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${record.name}</td>
-          <td>${record.start_date}</td>
-          <td>${record.end_date}</td>
-          <td class="type-${record.reason}">${record.reason}</td>
-          <td>${record.details}</td>
-          <td>${formatTime(record.submit_time)}</td>
-          <td class="status-${record.status}">${record.status || "pending"}</td>
+      .filter(x=>x.name===name)
+      .forEach(r=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td>${r.name}</td>
+          <td>${r.start_date}</td>
+          <td>${r.end_date}</td>
+          <td class="type-${r.reason}">${r.reason}</td>
+          <td>${r.details}</td>
+          <td>${r.days || ""}</td>
+          <td>${formatTime(r.submit_time)}</td>
+          <td class="status-${r.status}">${r.status || "pending"}</td>
         `;
         tbody.appendChild(tr);
       });
   }
 
-  /* 管理者查看所有紀錄 */
-  async function fetchAdminRecords() {
+  /* 管理者紀錄 */
+  async function fetchAdminRecords(){
     const res = await fetch(API_LEAVE);
     const data = await res.json();
-    const tbody = document.querySelector("#adminTable tbody");
-    tbody.innerHTML = "";
 
-    (data.leaves || []).forEach((record) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${record.name}</td>
-        <td>${record.start_date}</td>
-        <td>${record.end_date}</td>
-        <td class="type-${record.reason}">${record.reason}</td>
-        <td>${record.details}</td>
-        <td>${formatTime(record.submit_time)}</td>
-        <td class="status-${record.status}">${record.status || "pending"}</td>
+    const tbody=document.querySelector("#adminTable tbody");
+    tbody.innerHTML="";
+
+    (data.leaves||[]).forEach(r=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${r.name}</td>
+        <td>${r.start_date}</td>
+        <td>${r.end_date}</td>
+        <td class="type-${r.reason}">${r.reason}</td>
+        <td>${r.details}</td>
+        <td>${r.days || ""}</td>
+        <td>${formatTime(r.submit_time)}</td>
+        <td class="status-${r.status}">${r.status || "pending"}</td>
         <td>
-          <button class="approve-btn" data-id="${record.id}">核准</button>
-          <button class="reject-btn" data-id="${record.id}">駁回</button>
+          <button class="approve-btn" data-id="${r.id}">核准</button>
+          <button class="reject-btn" data-id="${r.id}">駁回</button>
         </td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  /* 審核功能 */
-  document.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("approve-btn"))
-      updateStatus(e.target.dataset.id, "approved");
+  /* 審核按鈕 */
+  document.addEventListener("click",async(e)=>{
+    if(e.target.classList.contains("approve-btn"))
+      updateStatus(e.target.dataset.id,"approved");
 
-    if (e.target.classList.contains("reject-btn"))
-      updateStatus(e.target.dataset.id, "rejected");
+    if(e.target.classList.contains("reject-btn"))
+      updateStatus(e.target.dataset.id,"rejected");  
   });
 
-  async function updateStatus(id, status) {
-    const res = await fetch(API_REVIEW, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
+  async function updateStatus(id,status){
+    const res = await fetch(API_REVIEW,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ id,status })
     });
-    const msg = await res.json();
+    const msg=await res.json();
     alert(msg.message || "已更新");
     fetchAdminRecords();
   }
 
   /* 日期篩選 */
-  filterBtn.addEventListener("click", async () => {
-    const date = document.getElementById("filterDate").value;
-    if (!date) {
-      alert("請先選擇日期！");
-      return;
-    }
-
-    const res = await fetch(API_LEAVE);
-    const data = await res.json();
-    const tbody = document.querySelector("#adminTable tbody");
-    tbody.innerHTML = "";
-
-    (data.leaves || [])
-      .filter((record) => record.start_date <= date && record.end_date >= date)
-      .forEach((record) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${record.name}</td>
-          <td>${record.start_date}</td>
-          <td>${record.end_date}</td>
-          <td class="type-${record.reason}">${record.reason}</td>
-          <td>${record.details}</td>
-          <td>${formatTime(record.submit_time)}</td>
-          <td class="status-${record.status}">${record.status || "pending"}</td>
+  filterBtn.addEventListener("click",async()=>{
+    const date=document.getElementById("filterDate").value;
+    if(!date) return alert("請先選擇日期！");
+    const res=await fetch(API_LEAVE);
+    const data=await res.json();
+    const tbody=document.querySelector("#adminTable tbody");
+    tbody.innerHTML="";
+    (data.leaves||[])
+      .filter(r=>r.start_date<=date && r.end_date>=date)
+      .forEach(r=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td>${r.name}</td>
+          <td>${r.start_date}</td>
+          <td>${r.end_date}</td>
+          <td class="type-${r.reason}">${r.reason}</td>
+          <td>${r.details}</td>
+          <td>${r.days || ""}</td>
+          <td>${formatTime(r.submit_time)}</td>
+          <td class="status-${r.status}">${r.status || "pending"}</td>
           <td>
-            <button class="approve-btn" data-id="${record.id}">核准</button>
-            <button class="reject-btn" data-id="${record.id}">駁回</button>
+            <button class="approve-btn" data-id="${r.id}">核准</button>
+            <button class="reject-btn" data-id="${r.id}">駁回</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -388,29 +392,29 @@
 <!-- LIFF -->
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-  (async function initLiffSafe() {
-    const LIFF_ID = "2008420032-nzxO4ew0";
-    try {
-      await liff.init({ liffId: LIFF_ID });
+  (async function initLiffSafe(){
+    const LIFF_ID="2008420032-nzxO4ew0";
+    try{
+      await liff.init({ liffId:LIFF_ID });
 
-      if (!liff.isLoggedIn()) {
-        liff.login({ redirectUri: window.location.href });
+      if(!liff.isLoggedIn()){
+        liff.login({ redirectUri:window.location.href });
         return;
       }
 
-      const profile = await liff.getProfile();
-      const name = profile.displayName;
+      const profile=await liff.getProfile();
+      const name=profile.displayName;
 
-      document.getElementById("userName").value = name;
-      document.getElementById("name").value = name;
+      document.getElementById("userName").value=name;
+      document.getElementById("name").value=name;
 
-      loginSection.style.display = "none";
-      leaveSection.style.display = "block";
+      loginSection.style.display="none";
+      leaveSection.style.display="block";
 
       fetchUserRecords(name);
 
-    } catch (err) {
-      console.warn("非 LINE 開啟或初始化失敗", err);
+    }catch(err){
+      console.warn("非 LINE 開啟或初始化失敗",err);
     }
   })();
 </script>
